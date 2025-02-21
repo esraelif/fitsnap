@@ -1,0 +1,13 @@
+{
+  "name": "Node",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:18",
+  "updateRemoteUserUID": true,
+  "remoteUser": "node",
+  "containerUser": "node",
+  "postCreateCommand": "sudo chown -R node:node .",
+  "customizations": {
+    "vscode": {
+      "extensions": ["esbenp.prettier-vscode", "bradlc.vscode-tailwindcss"]
+    }
+  }
+}
