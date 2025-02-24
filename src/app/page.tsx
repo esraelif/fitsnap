@@ -1,101 +1,194 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // App Router için
+import { FaComment, FaShareAlt } from "react-icons/fa";
+import { faqData } from "../data/faq"; // FAQ verilerini import ediyoruz
+
+export default function Header() {
+  const router = useRouter(); // Yönlendirme hook'u
+  const [showOptions, setShowOptions] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [showBlog, setShowBlog] = useState(false);
+  const [showFAQ, setShowFAQ] = useState(false); // FAQ bölümünü göstermek için state
+  const [expandedPost, setExpandedPost] = useState(null);
+  const [flippedCards, setFlippedCards] = useState({}); // Her bir kartın dönme durumunu tutacak state
+  const options = ["Breakfast", "Lunch", "Dinner", "Snack", "All"];
+
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        const response = await fetch("/api/blogPosts");
+        if (response.ok) {
+          const data = await response.json();
+          setBlogPosts(data);
+        } else {
+          console.error("Failed to fetch blog posts");
+        }
+      } catch (error) {
+        console.error("Error fetching blog posts:", error);
+      }
+    };
+
+    fetchBlogPosts();
+  }, []);
+
+  const handleOptionClick = (option) => {
+    if (option === "All") {
+      setSelectedOptions(["All"]);
+    } else {
+      const updatedOptions = selectedOptions.includes(option)
+        ? selectedOptions.filter((item) => item !== option)
+        : [...selectedOptions.filter((item) => item !== "All"), option];
+      setSelectedOptions(updatedOptions);
+    }
+  };
+
+  const toggleReadMore = (id) => {
+    setExpandedPost(expandedPost === id ? null : id);
+  };
+
+  // Anasayfaya yönlendirme fonksiyonu
+  const goToHome = () => {
+    router.push("/");
+  };
+
+  // Kartın dönme durumunu değiştiren fonksiyon
+  const toggleFlip = (id) => {
+    setFlippedCards((prev) => ({
+      ...prev,
+      [id]: !prev[id], // Kartın mevcut durumunu tersine çevir
+    }));
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="bg-white absolute inset-0">
+      <header
+        id="header"
+        className="flex flex-wrap justify-between items-center p-4 bg-teal-600 text-white"
+      >
+        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+          {/* FITSNAP başlığı - Tıklayınca ana sayfaya yönlendirir */}
+          <h1
+            className="text-2xl font-bold w-full md:w-auto text-center md:text-left cursor-pointer"
+            onClick={goToHome}
+          >
+            FITSNAP
+          </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
+            <button
+              className="bg-teal-500 px-4 py-2 rounded hover:bg-teal-400"
+              onClick={() => setShowOptions(!showOptions)}
+            >
+              Popular Recipes
+            </button>
+            {showOptions && (
+              <div className="flex flex-col gap-2 mt-2">
+                {options.map((option) => (
+                  <button
+                    key={option}
+                    className={`px-4 py-2 rounded ${
+                      selectedOptions.includes(option)
+                        ? "bg-yellow-500"
+                        : "bg-teal-500"
+                    }`}
+                    onClick={() => handleOptionClick(option)}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              className="bg-teal-500 px-4 py-2 rounded hover:bg-teal-400"
+              onClick={() => setShowBlog(!showBlog)}
+            >
+              Blog
+            </button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start mt-4 md:mt-0">
+          <button
+            className="bg-teal-500 px-4 py-2 rounded hover:bg-teal-400"
+            onClick={() => setShowFAQ(!showFAQ)}
+          >
+            F.A.Q
+          </button>
+          <button className="bg-teal-500 px-4 py-2 rounded hover:bg-teal-400">
+            LOGIN
+          </button>
+          <button className="bg-yellow-500 px-4 py-2 rounded hover:bg-yellow-400">
+            GET STARTED
+          </button>
+        </div>
+      </header>
+
+      {showBlog && (
+        <div className="p-4 space-y-4">
+          {blogPosts.map((post) => (
+            <div
+              key={post.id}
+              className="border p-4 rounded-lg shadow-lg bg-white"
+            >
+              <h2 className="text-xl font-bold text-teal-700">{post.title}</h2>
+              <p className="text-sm text-gray-500">By {post.author}</p>
+              <p className="mt-2">
+                {expandedPost === post.id ? post.fullContent : post.body}
+              </p>
+              <button
+                className="text-blue-500 mt-2 hover:underline"
+                onClick={() => toggleReadMore(post.id)}
+              >
+                {expandedPost === post.id ? "Show Less" : "Read More..."}
+              </button>
+
+              <div className="flex items-center justify-between mt-4">
+                <button className="flex items-center text-gray-600">
+                  <FaComment className="mr-1" /> Comment
+                </button>
+                <button className="flex items-center text-gray-600">
+                  <FaShareAlt className="mr-1" /> Share
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {showFAQ && (
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {faqData.map((faq) => (
+            <div
+              key={faq.id}
+              className="relative h-48 cursor-pointer"
+              style={{ perspective: "1000px" }}
+              onClick={() => toggleFlip(faq.id)} // Kartın üzerine tıklandığında döndür
+            >
+              {/* Kartın ön yüzü */}
+              <div
+                className={`absolute w-full h-full bg-white rounded-lg shadow-lg p-4 flex items-center justify-center text-center transition-transform duration-500 ${
+                  flippedCards[faq.id] ? "rotate-y-180" : ""
+                }`}
+                style={{ backfaceVisibility: "hidden" }}
+              >
+                <p className="text-teal-700 font-bold">{faq.question}</p>
+              </div>
+              {/* Kartın arka yüzü */}
+              <div
+                className={`absolute w-full h-full bg-teal-500 rounded-lg shadow-lg p-4 flex items-center justify-center text-center transition-transform duration-500 ${
+                  flippedCards[faq.id] ? "" : "rotate-y-180"
+                }`}
+                style={{ backfaceVisibility: "hidden" }}
+              >
+                <p className="text-white">{faq.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
