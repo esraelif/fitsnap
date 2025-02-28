@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 
 export default function Header() {
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeFAQIndex, setActiveFAQIndex] = useState<number | null>(null);
+  const [activeFAQIndex, setActiveFAQIndex] = useState(null);
   const [activeLogin, setActiveLogin] = useState(false);
   const [showGetStarted, setShowGetStarted] = useState(false);
   const [showSignUpForm, setShowSignUpForm] = useState(false);
@@ -171,7 +171,6 @@ export default function Header() {
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center py-4 px-6">
           <h1 className="text-2xl font-bold text-green-600">Fitsnap</h1>
-
           <nav
             className={`md:flex space-x-6 ${
               isMobileMenuOpen ? "block" : "hidden"
@@ -198,6 +197,7 @@ export default function Header() {
             >
               F.A.Q
             </a>
+
             <a
               className="bg-green-600 text-white px-5 py-3 rounded-xl hover:bg-green-700 transition shadow-md hover:shadow-lg"
               onClick={() => setShowGetStarted(true)}
@@ -319,6 +319,7 @@ export default function Header() {
               </div>
             )}
           </nav>
+
           <button
             className="md:hidden text-gray-700 focus:outline-none"
             onClick={toggleMobileMenu}
@@ -328,7 +329,105 @@ export default function Header() {
           </button>
         </div>
       </header>
+      {/* Popular Recipes Section */}
+      {activeSection === "recipes" && (
+        <section id="recipes" className="container mx-auto p-6">
+          <div className="flex space-x-4">
+            {Object.keys(recipes).map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </button>
+            ))}
+          </div>
+          {activeCategory && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recipes[activeCategory].map((recipe, index) => (
+                <div key={index} className="border p-4 rounded-lg shadow-md">
+                  <img
+                    src={recipe.image}
+                    alt={recipe.name}
+                    className="w-full h-40 object-cover rounded-md"
+                  />
+                  <h2 className="text-xl font-bold mt-2">{recipe.name}</h2>
+                  <p>
+                    <strong>Ingredients:</strong> {recipe.ingredients}
+                  </p>
+                  <p>
+                    <strong>Calories:</strong> {recipe.calories}
+                  </p>
+                  <p>
+                    <strong>Time:</strong> {recipe.time}
+                  </p>
+                  <p>
+                    <strong>Instructions:</strong> {recipe.instructions}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Blog Section */}
+      {activeSection === "blog" && (
+        <section id="blog" className="container mx-auto p-6">
+          <h2 className="text-2xl font-bold mb-6">Blog Posts</h2>
+          {blogPosts.map((post, index) => (
+            <div key={index} className="mb-6 border p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold">{post.title}</h3>
+              <p className="text-sm text-gray-600">By {post.author}</p>
+              <img
+                src={post.image}
+                alt={post.title}
+                className="w-full h-48 object-cover mt-4 rounded-md"
+              />
+              <p className="mt-4">{post.content}</p>
+              <p className="mt-2">{post.body}</p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* FAQ Section */}
+      {activeSection === "faq" && (
+        <section
+          id="faq"
+          className="container mx-auto p-6 bg-gray-50 rounded-lg"
+        >
+          <h2 className="text-2xl font-bold mb-6 text-center text-green-600">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            {faqItems.map((item, index) => (
+              <div key={index} className="border-b-2 border-gray-200">
+                <button
+                  className="w-full text-left p-4 font-semibold text-gray-800 hover:text-green-600 focus:outline-none"
+                  onClick={() => toggleFAQ(index)}
+                >
+                  <div className="flex justify-between items-center">
+                    <span>{item.question}</span>
+                    <span className="transform transition-all duration-300">
+                      {activeFAQIndex === index ? "▲" : "▼"}
+                    </span>
+                  </div>
+                </button>
+                {activeFAQIndex === index && (
+                  <p className="p-4 text-gray-600">{item.answer}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Features Section */}
+      <h1 className="flex justify-center mt-6 text-3xl font-bold text-pink-600">
+        Your Personalized Path to Wellness!
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 p-10">
         <div
           className="bg-cover bg-center p-6 rounded-lg text-center transition-transform transform hover:scale-105"
@@ -449,43 +548,7 @@ export default function Header() {
           </div>
         </div>
       </section>
-
       {/* Testimonial Section */}
-      {/* <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Testimonial</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-              <p className="text-gray-600">
-                “FifSnap completely changed the way I eat! The personalized meal
-                plans are easy to follow and actually delicious.”
-              </p>
-              <p className="text-gray-800 font-semibold mt-4">– Emily R.</p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-              <p className="text-gray-600">
-                “I used to struggle with what to cook every day. Now I just
-                check my plan and enjoy healthy meals without overthinking.”
-              </p>
-              <p className="text-gray-800 font-semibold mt-4">– James L.</p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-              <p className="text-gray-600">
-                “Finally, a health app that understands my needs! I love how I
-                can choose my diet preferences and get tailored recipes.”
-              </p>
-              <p className="text-gray-800 font-semibold mt-4">– Sofia M.</p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-              <p className="text-gray-600">
-                “Thanks to FifSnap, I’ve lost 10 pounds in 2 months while still
-                enjoying my favorite foods in moderation.”
-              </p>
-              <p className="text-gray-800 font-semibold mt-4">– Daniel K.</p>
-            </div>
-          </div>
-        </div>
-      </section> */}
       <section className="py-16 bg-gradient-to-b from-purple-50 to-blue-100">
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-extrabold text-center mb-12 text-gray-900 tracking-wide">
@@ -523,7 +586,6 @@ export default function Header() {
           </div>
         </div>
       </section>
-
       {/* How It Works Section */}
       <section className="py-16 bg-gradient-to-b from-blue-500 to-purple-600 text-white">
         <div className="container mx-auto px-6">
@@ -562,44 +624,7 @@ export default function Header() {
           </div>
         </div>
       </section>
-
       {/* Pricing Plans Section */}
-      {/* <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Pricing Plans</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4">
-                Free Plan (Forever Free)!
-              </h3>
-              <ul className="list-disc list-inside text-gray-600">
-                <li>Access to basic meal plans</li>
-                <li>Healthy recipe suggestions</li>
-                <li>Progress tracking</li>
-                <li>Work intake reminders</li>
-              </ul>
-              <button className="mt-6 bg-blue-500 text-white px-6 py-2 rounded-lg">
-                Start for Free!
-              </button>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-4">
-                Premium Plan (Best Value)
-              </h3>
-              <ul className="list-disc list-inside text-gray-600">
-                <li>Everything in Free Plan</li>
-                <li>Exclusive premium recipes</li>
-                <li>Advanced progress tracking</li>
-                <li>Smart grocery lists</li>
-                <li>Priority support</li>
-              </ul>
-              <button className="mt-6 bg-blue-500 text-white px-6 py-2 rounded-lg">
-                Start Your Free Trial!
-              </button>
-            </div>
-          </div>
-        </div>
-      </section> */}
       <section className="py-16 bg-gradient-to-b from-blue-50 to-purple-100">
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-extrabold text-center mb-12 text-gray-900 tracking-wide">
@@ -657,7 +682,6 @@ export default function Header() {
           </div>
         </div>
       </section>
-
       {/* Footer Section */}
       <footer className="py-12 bg-gray-800 text-white">
         <div className="container mx-auto px-4">
@@ -747,101 +771,6 @@ export default function Header() {
           </div>
         </div>
       </footer>
-
-      {/* Popular Recipes Section */}
-      {activeSection === "recipes" && (
-        <section id="recipes" className="container mx-auto p-6">
-          <div className="flex space-x-4">
-            {Object.keys(recipes).map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-              >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </button>
-            ))}
-          </div>
-          {activeCategory && (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recipes[activeCategory].map((recipe, index) => (
-                <div key={index} className="border p-4 rounded-lg shadow-md">
-                  <img
-                    src={recipe.image}
-                    alt={recipe.name}
-                    className="w-full h-40 object-cover rounded-md"
-                  />
-                  <h2 className="text-xl font-bold mt-2">{recipe.name}</h2>
-                  <p>
-                    <strong>Ingredients:</strong> {recipe.ingredients}
-                  </p>
-                  <p>
-                    <strong>Calories:</strong> {recipe.calories}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {recipe.time}
-                  </p>
-                  <p>
-                    <strong>Instructions:</strong> {recipe.instructions}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* Blog Section */}
-      {activeSection === "blog" && (
-        <section id="blog" className="container mx-auto p-6">
-          <h2 className="text-2xl font-bold mb-6">Blog Posts</h2>
-          {blogPosts.map((post, index) => (
-            <div key={index} className="mb-6 border p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold">{post.title}</h3>
-              <p className="text-sm text-gray-600">By {post.author}</p>
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-48 object-cover mt-4 rounded-md"
-              />
-              <p className="mt-4">{post.content}</p>
-              <p className="mt-2">{post.body}</p>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {/* FAQ Section */}
-      {activeSection === "faq" && (
-        <section
-          id="faq"
-          className="container mx-auto p-6 bg-gray-50 rounded-lg"
-        >
-          <h2 className="text-2xl font-bold mb-6 text-center text-green-600">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-4">
-            {faqItems.map((item, index) => (
-              <div key={index} className="border-b-2 border-gray-200">
-                <button
-                  className="w-full text-left p-4 font-semibold text-gray-800 hover:text-green-600 focus:outline-none"
-                  onClick={() => toggleFAQ(index)}
-                >
-                  <div className="flex justify-between items-center">
-                    <span>{item.question}</span>
-                    <span className="transform transition-all duration-300">
-                      {activeFAQIndex === index ? "▲" : "▼"}
-                    </span>
-                  </div>
-                </button>
-                {activeFAQIndex === index && (
-                  <p className="p-4 text-gray-600">{item.answer}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
     </>
   );
 }
