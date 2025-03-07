@@ -1,10 +1,10 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}", // src/pages altındaki tüm dosyaları tarar
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}", // Eğer components klasörünüz varsa, onu da ekleyebilirsiniz
+    "./src/**/*.{html,js,jsx,ts,tsx}", // Genel olarak src içinde yer alan diğer dosyaları da kapsar
   ],
   theme: {
     extend: {
@@ -26,4 +26,6 @@ export default {
     },
   },
   plugins: [],
-} satisfies Config;
+};
+
+export default config;
